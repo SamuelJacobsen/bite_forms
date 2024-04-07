@@ -100,5 +100,44 @@ const getAllQuestions = async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor' });
     }
 };
+// Função para alterar uma pergunta específica
+const updateQuestion = async (req, res) => {
+    try {
+        const questionId = req.params.questionId;
+        const { question, options } = req.body;
 
-module.exports = { createQuestion, voteQuestion, getQuestionDetails, getAllQuestions };
+        // Verifica se a pergunta e as opções foram fornecidas
+        if (!question || !options || options.length < 2) {
+            return res.status(400).json({ error: 'Pergunta ou opções inválidas' });
+        }
+
+        // Atualiza os dados da pergunta no Firestore
+        await admin.firestore().collection('questions').doc(questionId).update({
+            question: question,
+            options: options.map(option => ({ text: option })),
+            votes: options.map(() => 0) // Recria o array de votos para cada opção com zero
+        });
+
+        res.status(200).json({ message: 'Pergunta atualizada com sucesso' });
+    } catch (error) {
+        console.error('Erro ao atualizar pergunta:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
+// Função para deletar uma pergunta específica
+const deleteQuestion = async (req, res) => {
+    try {
+        const questionId = req.params.questionId;
+
+        // Remove a pergunta do Firestore
+        await admin.firestore().collection('questions').doc(questionId).delete();
+
+        res.status(200).json({ message: 'Pergunta removida com sucesso' });
+    } catch (error) {
+        console.error('Erro ao remover pergunta:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+};
+
+module.exports = { createQuestion, voteQuestion, getQuestionDetails, getAllQuestions, deleteQuestion, updateQuestion};

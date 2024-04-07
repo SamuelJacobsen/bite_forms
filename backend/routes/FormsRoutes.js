@@ -15,4 +15,9 @@ router.get('/:questionId', formsController.getQuestionDetails);
 // Rota para listar todas as perguntas disponíveis
 router.get('/', formsController.getAllQuestions);
 
+// Rota para alterar dados de uma pergunta específica
+router.put('/forms/:questionId', formsController.updateQuestion);
+
+// Rota para remover uma pergunta específica
+router.delete('/forms/:questionId', formsController.deleteQuestion);
 module.exports = router;
